@@ -6,7 +6,6 @@ from os import makedirs
 from os.path import join, exists
 from importlib import import_module
 
-
 def arg_parse():
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', '--path_planner', default='rrt_star', 
@@ -28,6 +27,9 @@ def arg_parse():
     parser.add_argument('--path_len_threshold_percentage', type=float, default=0.02, help='block use only.')
     parser.add_argument('--iter_after_initial', type=int, default=5000, help='random_2d use only.')
     parser.add_argument('--num_problems', type=int, help='number of problems to evaluate. None means evaluate all.')
+    
+    parser.add_argument('--output_path', default='results/evaluation/2d', help='path')
+    parser.add_argument('--data_path', default='.', help='path')
     return parser.parse_args()
 
 
@@ -80,14 +82,14 @@ else:
 if args.problem == 'random_2d':
     args.clearance = 3
 print(args)
-env_config_list = get_env_configs()
+env_config_list = get_env_configs(args.data_path)
 if args.num_problems is None:
     num_problems = len(env_config_list)
 else:
     assert args.num_problems <= len(env_config_list)
     num_problems = args.num_problems
 
-result_folderpath = 'results/evaluation/2d'
+result_folderpath = args.output_path
 makedirs(result_folderpath, exist_ok=True)
 
 if args.connect != 'none':
@@ -132,5 +134,5 @@ for env_idx, env_config in enumerate(env_config_list[:num_problems]):
 
     with open(result_filepath, 'wb') as f:
         pickle.dump(env_result_config_list, f)
-    time_left = (time.time() - eval_start_time) * (num_problems / (env_idx + 1) - 1) / 60
+    time_left = (time.time() - eval_start_time) * (num_problems - env_idx - 1) / (env_idx + 1) / 60
     print("Evaluated {0}/{1}, remaining time: {2} min for {3}".format(env_idx + 1, num_problems, int(time_left), eval_setting))

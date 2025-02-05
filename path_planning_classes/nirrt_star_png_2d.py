@@ -1,9 +1,9 @@
 import numpy as np
-
 from path_planning_utils.rrt_env import Env
 from path_planning_classes.irrt_star_2d import IRRTStar2D
 from path_planning_classes.rrt_base_2d import RRTBase2D
 from path_planning_classes.rrt_visualizer_2d import NIRRTStarVisualizer
+
 from datasets.point_cloud_mask_utils import get_point_cloud_mask_around_points, \
     generate_rectangle_point_cloud, ellipsoid_point_cloud_sampling
 
@@ -61,9 +61,11 @@ class NIRRTStarPNG2D(IRRTStar2D):
         self.init_pc() # * nirrt*
         c_best = np.inf
         c_update = c_best # * nirrt*
+        no_solution = True
+        first_iter = 1000000
         for k in range(self.iter_max):
-            if k % 1000 == 0:
-                print(k)
+            # if k % 1000 == 0:
+            #     print(k)
             if len(self.path_solutions)>0:
                 c_best, x_best = self.find_best_path_solution()
             node_rand, c_update = self.generate_random_node(c_best, start_goal_straightline_dist, x_center, C, c_update) # * nirrt*
@@ -87,13 +89,27 @@ class NIRRTStarPNG2D(IRRTStar2D):
                     self.rewire(node_new, neighbor_indices, node_new_index)
                 if self.InGoalRegion(node_new):
                     self.path_solutions.append(node_new_index)
+                    if no_solution:
+                        no_solution = False
+                        first_iter = k
+                        print("First path found in:", k)
+                        
+                    
         if len(self.path_solutions)>0:
             c_best, x_best = self.find_best_path_solution()
             self.path = self.extract_path(x_best)
         else:
             self.path = []
+        
+        if no_solution:
+            print("No solution to be found!")
+        else:
+            print("Final path cost:", c_best)
+            
         if visualize:
             self.visualize(x_center, c_best, start_goal_straightline_dist, theta)
+        
+        return first_iter, c_best
 
 
     def generate_random_node(
@@ -109,6 +125,8 @@ class NIRRTStarPNG2D(IRRTStar2D):
             - node_rand: np (2,)
             - c_update: scalar
         '''
+        
+        # print(c_curr)
         # * tested that np.inf < alpha*np.inf is False, alpha in (0,1]
         if c_curr < self.pc_update_cost_ratio*c_update:
             self.update_point_cloud(c_curr, c_min)
@@ -116,7 +134,7 @@ class NIRRTStarPNG2D(IRRTStar2D):
         if np.random.random() < self.pc_sample_rate:
             return self.SamplePointCloud(), c_update
         else:
-            if c_curr < np.inf:
+            if c_curr < np.inf and c_curr < 400:
                 return self.SampleInformedSubset(
                     c_curr,
                     c_min,

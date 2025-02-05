@@ -107,7 +107,7 @@ class IRRTStarVisualizer(RRTStarVisualizer):
                   x_center, c_best, dist, theta, img_filename=None, img_folder='visualization/planning_demo'):
         self.plot_grid(figure_title)
         self.plot_visited(vertices, vertex_parents, animation=False)
-        if c_best != np.inf:
+        if c_best != np.inf and c_best < 450:
             self.draw_ellipse(x_center, c_best, dist, theta)
         self.plot_path(path)
         if img_filename is None:
@@ -173,14 +173,16 @@ class NIRRTStarVisualizer(IRRTStarVisualizer):
         self.path_point_cloud_pred = path_point_cloud_pred
 
     def animation(self, vertices, vertex_parents, path, figure_title,\
-                  x_center, c_best, dist, theta, img_filename=None, img_folder='visualization/planning_demo'):
+                  x_center, c_best, dist, theta, img_filename=None, img_folder='.\\visualization\\planning_demo'):
         self.plot_grid(figure_title)
         # self.plot_visited(vertices, vertex_parents, animation=False)
+        
         if self.path_point_cloud_pred is not None:
+            print("Total pred points:", len(self.path_point_cloud_pred[:,0]))
             plt.scatter(self.path_point_cloud_pred[:,0], self.path_point_cloud_pred[:,1], s=2, c='C1')
         if self.path_point_cloud_other is not None:
             plt.scatter(self.path_point_cloud_other[:,0], self.path_point_cloud_other[:,1], s=2, c='C0')
-        if c_best != np.inf:
+        if c_best != np.inf and c_best < 350:
             self.draw_ellipse(x_center, c_best, dist, theta)
         self.plot_path(path)
         if img_filename is None:

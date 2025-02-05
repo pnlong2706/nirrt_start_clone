@@ -15,8 +15,12 @@ class PNGWrapper:
         self,
         num_classes=2,
         root_dir='.',
-        device='cuda',
+        device='cpu',
     ):
+        
+        if(device == 'cuda' and not torch.cuda.is_available()):
+            device = 'cpu'
+        
         """
         - inputs:
             - num_classes: default 2, for path and not path.
@@ -118,6 +122,10 @@ class PNGWrapper:
             x_goal[np.newaxis].astype(np.float32),
             neighbor_radius,
         )
+        
+        # print(len(pc))
+        # print(pc[0])
+        
         for trial_i in range(max_trial_attempts):
             path_pred, path_score = self.classify_path_points(
                 pc,
@@ -237,6 +245,31 @@ class PNGWrapper:
             goal_mask = next_goal_mask
         connection_success = has_path
         num_png_runs = trial_i+1
+        
+        # print("DEBUG_WRP")
+        # print(len(path_pred_mask))
+        # print(path_pred_mask[0])
+        
+        # self.visualize_path_points(pc=pc, x_start=x_start, x_goal=x_goal, path_pred_mask=path_pred_mask, img_height=224, img_width=224, img_filename="stat/helo.png")
+        
+        # for i in range(len(pc)):
+        #     if 15 < pc[i][0] and pc[i][0] < 65 and 150 < pc[i][1] and pc[i][1] < 212:
+        #         path_pred_mask[i] = 1
+                
+        # for i in range(len(pc)):
+        #     if 65 < pc[i][0] and pc[i][0] < 115 and 17 < pc[i][1] and pc[i][1] < 150:
+        #         path_pred_mask[i] = 1
+                
+        # for i in range(len(pc)):
+        #     if 115 < pc[i][0] and pc[i][0] < 165 and 120 < pc[i][1] and pc[i][1] < 212:
+        #         path_pred_mask[i] = 1
+                
+        # for i in range(len(pc)):
+        #     if 165 < pc[i][0] and pc[i][0] < 215 and 17 < pc[i][1] and pc[i][1] < 150:
+        #         path_pred_mask[i] = 1
+                
+        # self.visualize_path_points(pc=pc, x_start=x_start, x_goal=x_goal, path_pred_mask=path_pred_mask, img_height=224, img_width=224, img_filename="stat/helo.png")
+        
         return connection_success, num_png_runs, path_pred_mask
 
     def visualize_path_points(
@@ -258,9 +291,10 @@ class PNGWrapper:
         ax.plot(x_start[0], x_start[1], 'r*', ms=3)
         ax.plot(x_goal[0], x_goal[1], 'y*', ms=3)
         ax.set_aspect('equal', adjustable='box')
-        ax.set_xlim([-img_width, img_width])
-        ax.set_ylim([-img_height, img_height])
+        # ax.set_xlim([-img_width, img_width])
+        # ax.set_ylim([-img_height, img_height])
         plt.axis('off')
+        plt.show()
         fig.savefig(img_filename, bbox_inches='tight', pad_inches=0)
         return
 

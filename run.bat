@@ -1,0 +1,10 @@
+py demo_planning_2d.py -p nirrt_star -n pointnet2 -c bfs --problem random_2d --iter_max 4200
+py demo_planning_2d.py -p nirrt_star -n pointnet2 -c bfs --problem random_2d --iter_max 4200
+py demo_planning_2d.py -p nirrt_star -n pointnet2 -c bfs --problem random_2d --iter_max 4200
+py demo_planning_2d.py -p nirrt_star -n pointnet2 -c bfs --problem random_2d --iter_max 4200
+py demo_planning_2d.py -p nirrt_star -n pointnet2 -c bfs --problem random_2d --iter_max 4200
+py demo_planning_2d.py -p nirrt_star -n pointnet2 -c bfs --problem random_2d --iter_max 4200
+py demo_planning_2d.py -p nirrt_star -n pointnet2 -c bfs --problem random_2d --iter_max 4200
+py demo_planning_2d.py -p nirrt_star -n pointnet2 -c bfs --problem random_2d --iter_max 4200
+py demo_planning_2d.py -p nirrt_star -n pointnet2 -c bfs --problem random_2d --iter_max 4200
+py demo_planning_2d.py -p nirrt_star -n pointnet2 -c bfs --problem random_2d --iter_max 4200

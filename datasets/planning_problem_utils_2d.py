@@ -27,12 +27,12 @@ def get_gap_env_configs(root_dir='.'):
         block_gap_configs = json.load(f)
     return block_gap_configs['gap']
 
-def get_random_2d_env_configs(root_dir='.'):
+def get_random_2d_env_configs(root_dir='.', mode = "test"):
     '''
     The random 2d world dataset has 4 pairs of start and goal for each obstacle map.
     We transform one obstacle map into 4 environments for evaluation.
     '''
-    with open(join("data", "random_2d", "test", "envs.json"), 'r') as f:
+    with open(join(root_dir, "data", "random_2d", mode, "envs.json"), 'r') as f:
         random_2d_map_list = json.load(f)
     env_config_list = []
     for map_idx, env_dict_per_map in enumerate(random_2d_map_list):
@@ -142,11 +142,11 @@ def get_gap_problem_input(gap_env_config):
     return problem
 
 
-def get_random_2d_problem_input(random_2d_env_config):
+def get_random_2d_problem_input(random_2d_env_config, mode = "test"): # mode = train || test 
     '''
     The last None is to match outputs of other get_problem_input functions.
     '''
-    env_img = cv2.imread(join("data", "random_2d", "test", "env_imgs", "{0}.png".format(random_2d_env_config['img_idx'])))
+    env_img = cv2.imread(join("data", "random_2d", mode, "env_imgs", "{0}.png".format(random_2d_env_config['img_idx'])))
     binary_mask = get_binary_mask(env_img)
     env_dict = random_2d_env_config['env_dict']
     x_start = tuple(env_dict['start'][0])

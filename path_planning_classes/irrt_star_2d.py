@@ -45,9 +45,11 @@ class IRRTStar2D(RRTStar2D):
     ):
         theta, start_goal_straightline_dist, x_center, C = self.init()
         c_best = np.inf
+        no_solution = True
+        first_iter = 1000000
         for k in range(self.iter_max):
-            if k % 1000 == 0:
-                print(k)
+            # if k % 1000 == 0:
+            #     print(k)
             if len(self.path_solutions)>0:
                 c_best, x_best = self.find_best_path_solution()
             node_rand = self.generate_random_node(c_best, start_goal_straightline_dist, x_center, C)
@@ -71,15 +73,28 @@ class IRRTStar2D(RRTStar2D):
                     self.rewire(node_new, neighbor_indices, node_new_index)
                 if self.InGoalRegion(node_new):
                     self.path_solutions.append(node_new_index)
-        if self.iter_max % 1000 == 0:
-            print(self.iter_max)
+                    if no_solution:
+                        print("First path found in:", k)
+                        no_solution = False
+                        first_iter = k
+                        
+        # if self.iter_max % 1000 == 0:
+        #     print(self.iter_max)
         if len(self.path_solutions)>0:
             c_best, x_best = self.find_best_path_solution()
             self.path = self.extract_path(x_best)
         else:
             self.path = []
+        
+        if no_solution:
+            print("No solution to be found!")
+        else:
+            print("Final path cost:", c_best)
+            
         if visualize:
             self.visualize(x_center, c_best, start_goal_straightline_dist, theta)
+
+        return first_iter, c_best
 
     def find_best_path_solution(self):
         '''
@@ -107,7 +122,7 @@ class IRRTStar2D(RRTStar2D):
         - outputs
             - node_rand: np (2,)
         '''
-        if c_max < np.inf:
+        if c_max < np.inf and c_max < 450:
             node_rand = self.SampleInformedSubset(
                 c_max,
                 c_min,
@@ -164,7 +179,7 @@ class IRRTStar2D(RRTStar2D):
         if figure_title is None:
             figure_title = "irrt* 2D, iteration " + str(self.iter_max)
         if img_filename is None:
-            img_filename="irrt*_2d_example.png"
+            img_filename="irrt_star_2d_example.png"
         self.visualizer.animation(
             self.vertices[:self.num_vertices],
             self.vertex_parents[:self.num_vertices],

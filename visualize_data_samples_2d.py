@@ -1,5 +1,6 @@
 import os
 import argparse
+import matplotlib.pyplot as plt
 
 import cv2
 import numpy as np
@@ -14,17 +15,21 @@ argparser.add_argument('--visual_example_token', type=str, default=None, help='V
 
 args = argparser.parse_args()
 
-env_config_list = get_env_configs()
+mode = "train"
+
+env_config_list = get_env_configs(mode = mode)
 img_folderpath = "visualization/img_with_labels_2d/"
 os.makedirs(img_folderpath, exist_ok=True)
+
+
 
 for env_config in env_config_list:
     if args.visual_example_token is not None:
         if args.visual_example_token != str(env_config['img_idx'])+'_'+str(env_config['start_goal_idx']):
             continue
-    problem = get_problem_input(env_config)
+    problem = get_problem_input(env_config, mode=mode)
     visual_example_token = str(env_config['img_idx'])+'_'+str(env_config['start_goal_idx'])
-    path = np.loadtxt("data/random_2d/test/astar_paths/"+visual_example_token+".txt", delimiter=',')
+    path = np.loadtxt("data/random_2d/"+ mode +"/astar_paths/"+visual_example_token+".txt", delimiter=',')
     path = path.astype(int)
 
     visualizer = RRTStarVisualizer(problem['x_start'], problem['x_goal'], problem['env'])
@@ -32,7 +37,9 @@ for env_config in env_config_list:
     img_filename =  visual_example_token+"_plt.png"
     visualizer.plot_scene_path(path, figure_title, img_filename, img_folder=img_folderpath) # red start star, yellow goal star, red optimal path
     print(visual_example_token, " plotted.")
-    visual_example_env_img = cv2.imread("data/random_2d/test/env_imgs/{0}.png".format(env_config['img_idx']))
+    visual_example_env_img = cv2.imread("data/random_2d/"+ mode +"/env_imgs/{0}.png".format(env_config['img_idx']))
+    # plt.imshow(visual_example_env_img)
+    # plt.show()
     cv2.circle(visual_example_env_img, problem['x_start'], 5, (0,0,255), -1) # red start round mask
     cv2.circle(visual_example_env_img, problem['x_goal'], 5, (0,255,255), -1) # yellow goal round mask
     for pt1, pt2 in zip(path[:-1], path[1:]):

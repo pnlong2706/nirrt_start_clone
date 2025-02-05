@@ -17,7 +17,7 @@ class NIRRTStarPNGC2D(NIRRTStarPNG2D):
         search_radius,
         iter_max,
         env_dict,
-        png_wrapper_connect,
+        png_wrapper_connect, ## Point-based Network Guidance
         binary_mask,
         clearance,
         pc_n_points,
@@ -58,7 +58,12 @@ class NIRRTStarPNGC2D(NIRRTStarPNG2D):
             self.path_point_cloud_pred = None
             self.visualizer.set_path_point_cloud_pred(self.path_point_cloud_pred)
             return
-        if cmax < np.inf:
+        
+        ###########################################
+        ###########################################
+        ## CERTAIN CHANGE
+        ###########################################
+        if cmax < np.inf and cmax < 400:
             max_min_ratio = cmax/cmin
             pc = ellipsoid_point_cloud_sampling(
                 self.x_start,
@@ -82,15 +87,16 @@ class NIRRTStarPNGC2D(NIRRTStarPNG2D):
             neighbor_radius=self.pc_neighbor_radius,
             max_trial_attempts=self.connect_max_trial_attempts,
         )
+        
         self.path_point_cloud_pred = pc[path_pred.nonzero()[0]] # (<pc_n_points, 2)
         self.visualizer.set_path_point_cloud_pred(self.path_point_cloud_pred)
         self.visualizer.set_path_point_cloud_other(pc[np.nonzero(path_pred==0)[0]])
 
     def visualize(self, x_center, c_best, start_goal_straightline_dist, theta, figure_title=None, img_filename=None):
         if figure_title is None:
-            figure_title = "nirrt*(c) 2D, iteration " + str(self.iter_max)
+            figure_title = "nirrt star (c) 2D, iteration " + str(self.iter_max)
         if img_filename is None:
-            img_filename="nirrt*_c_2d_example.png"
+            img_filename="nirrt_st_c_2d_example.png"
         self.visualizer.animation(
             self.vertices[:self.num_vertices],
             self.vertex_parents[:self.num_vertices],

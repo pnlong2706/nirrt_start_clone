@@ -26,7 +26,7 @@ for i in range(len(result_filenames)):
     result_filenames[i] += '-'+str(random_dataset_len)
 visualization_folderpath = join('visualization', 'evaluation')
 os.makedirs(visualization_folderpath, exist_ok=True)
-results_folderpath = 'results/evaluation/2d'
+results_folderpath = 'results_eva/evaluation2/2d'
 for method, result_filename in zip(methods, result_filenames):
     with open(join(results_folderpath, result_filename+'.pickle'), 'rb') as f:
         random_results[method] = pickle.load(f)

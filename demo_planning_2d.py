@@ -1,5 +1,6 @@
 import argparse
 from importlib import import_module
+from a_start_path_cost import a_star_cost
 
 import numpy as np
 
@@ -78,13 +79,113 @@ else:
 if args.problem == 'random_2d':
     args.clearance = 3
 print(args)
-env_config_list = get_env_configs()
-env_config_index = np.random.randint(len(env_config_list))
-print("env_config_index: ", env_config_index)
-problem = get_problem_input(env_config_list[env_config_index])
+env_config_list = get_env_configs(mode = "train")
+
+
+import time
+
+first_iter_list = []
+c_best_list = []
+time_list = []
+astar_cost_list = []
+no_sol_cnt = 0
+
+first_iter_avg = 0
+c_best_avg = 0
+
+num = 0
+
+print("Total sample:", len(env_config_list))
+print(path_planner_name)
+
+env_config_index = 19*4 + 0
+id_env = env_config_index // 4
+id_env_cfg = env_config_index % 4
+
+astar_cost = a_star_cost("data/random_2d/train/astar_paths/"+ str(id_env) + "_" + str(id_env_cfg) +".txt")
+
+print("\n***** Env_config_index: ", env_config_index)
+print("Astar cost:", astar_cost)
+
+problem = get_problem_input(env_config_list[env_config_index], mode = "train")
 path_planner = get_path_planner(
     args,
     problem,
     neural_wrapper,
 )
-path_planner.planning(visualize=True) # * we can only run planning once, or we need reset.
+
+second = time.time()
+first_iter, c_best = path_planner.planning(visualize=True) # * we can only run planning once, or we need reset.
+total_time = time.time() - second
+print("Total time:", total_time)
+
+# for env_config_index in range(len(env_config_list)):
+    
+#     id_env = env_config_index // 4
+#     id_env_cfg = env_config_index % 4
+    
+#     astar_cost = a_star_cost("data/random_2d/train/astar_paths/"+ str(id_env) + "_" + str(id_env_cfg) +".txt")
+#     astar_cost_list.append(astar_cost)
+    
+#     print("\n***** Env_config_index: ", env_config_index)
+#     print("Astar cost:", astar_cost)
+    
+#     problem = get_problem_input(env_config_list[env_config_index], mode = "train")
+#     path_planner = get_path_planner(
+#         args,
+#         problem,
+#         neural_wrapper,
+#     )
+
+#     second = time.time()
+#     first_iter, c_best = path_planner.planning(visualize=False) # * we can only run planning once, or we need reset.
+#     total_time = time.time() - second
+    
+#     if(first_iter < 50000):
+#         # print("First path:", first_iter)
+#         # print("Path cost: ", c_best)
+        
+#         first_iter_list.append(first_iter)
+#         c_best_list.append(c_best)
+        
+#         first_iter_avg += first_iter
+#         c_best_avg += c_best
+#     else:
+#         # print("No solution!")    
+#         first_iter_list.append(-1)
+#         c_best_list.append(-1)
+        
+#         no_sol_cnt += 1
+    
+#     print("Total time:", total_time)
+#     time_list.append(total_time)
+#     num += 1
+    
+#     # if(env_config_index > 0):
+#     #     break
+
+# first_iter_avg = first_iter_avg / (num - no_sol_cnt)
+# c_best_avg = c_best_avg / (num - no_sol_cnt)
+
+# print("\n\n*********** FINISH ***********")
+# print("No solution count:", no_sol_cnt)
+# print("Avg first iter:", first_iter_avg)
+# print("Avg time:", np.average(np.array(time_list)))
+# print("Avg cost:", c_best_avg)
+
+# with open('stat/first_iter_list_'+ path_planner_name + '.txt', 'w') as f:
+#     for line in first_iter_list:
+#         f.write(f"{line}\n")
+        
+# with open('stat/c_best_list_'+ path_planner_name + '.txt', 'w') as f:
+#     for line in c_best_list:
+#         f.write(f"{line}\n")
+        
+# with open('stat/time_list_'+ path_planner_name + '.txt', 'w') as f:
+#     for line in time_list:
+#         f.write(f"{line}\n")
+        
+# with open('stat/astar_cost_list_'+ path_planner_name + '.txt', 'w') as f:
+#     for line in astar_cost_list:
+#         f.write(f"{line}\n")
+
