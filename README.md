@@ -17,3 +17,4 @@ https://github.com/tedhuang96/nirrt_star
 
 # Note
 -  This repo is a bit messy, mostly for testing, so cloning from the origin repo is another option.
+-  For data and model, please refer to the origin repo.
